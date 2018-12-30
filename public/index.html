@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title></title>
+        <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
+        <link href="/style.css" rel="stylesheet" type="text/css"/>
+    </head>
+    <body>
+        <h1 class="title">Unicorns- a Unicorn REST API</h1>
+        <div id="homepage">
+            <h1>Find a Unicorn in Your Area</h1>
+            <h2>Attention: in order to find a ninja in Israel, you need to insert lat:~32 and lng:~35.</h2>
+            <h2>Good Luck!</h2>
+            <div id="unicorns"></div>
+        </div>
+
+        <script src= "https://unpkg.com/babel-standalone@6.26.0/babel.min.js"></script>
+        <script src="https://unpkg.com/react@15/dist/react.js"></script>
+        <script src= "https://unpkg.com/react-dom@15/dist/react-dom.js"></script>
+
+   <!-- Create React Component -->
+   <script type="text/babel">
+    var Unicorns = React.createClass({
+        getInitialState: function(){
+            return({
+                unicorns: []
+            });
+        },
+        render: function(){
+            var unicorns = this.state.unicorns;
+            unicorns = unicorns.map(function(unicorn, index){
+                return(
+                    <li key={index}>
+                        <span className={unicorn.available}></span>
+                        <span className="name">{unicorn.name}</span>
+                        <span className="gender">{unicorn.gender}</span>
+                        <span className="age">{unicorn.age}</span>
+                        <span className="dist">{Math.floor(unicorn.dist.calculated / 1000)} km</span>
+                    </li>
+                );
+            });
+            return(
+                <div id="unicorn-container">
+                    <form id="search" onSubmit={this.handleSubmit}>
+                        <label>Enter your Latitude:</label>
+                        <input type="text" ref="lat" placeholder="latitude" required />
+                        <label>Enter your Longitude:</label>
+                        <input type="text" ref="lng" placeholder="longitude" required />
+                        <input type="submit" value="Find Unicorns" />
+                    </form>
+                    <ul>{unicorns}</ul>
+                </div>
+            );
+        },
+        handleSubmit: function(e){
+            e.preventDefault();
+            var lng = this.refs.lng.value;
+            var lat = this.refs.lat.value;
+            fetch('/api/unicorns?lng=' + lng + '&lat=' + lat).then(function(data){
+                return data.json();
+            }).then( json => {
+                this.setState({
+                    unicorns: json
+                });
+                console.log(json);
+            });
+        }
+    });
+    ReactDOM.render(<Unicorns />, document.getElementById('unicorns'));
+    </script>
+
+
+</body>
+</html>
